@@ -1,38 +1,44 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import React from "react";
 import "./App.css";
+import { useConnect } from "wagmi";
 
-import WebApp from "@twa-dev/sdk";
+export function WalletOptions() {
+  const { connectors, connect } = useConnect();
+  console.log(connectors, "connectors");
 
-function App() {
-  const [count, setCount] = useState(0);
+  return connectors.map((connector) => (
+    <button key={connector.uid} onClick={() => connect({ connector })}>
+      {connector.name}
+    </button>
+  ));
+}
+
+import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
+
+export function Account() {
+  const { address } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { data: ensName } = useEnsName({ address });
 
   return (
+    <div>
+      {address && <div>{ensName ? `${ensName} (${address})` : address}</div>}
+      <button onClick={() => disconnect()}>Disconnect</button>
+    </div>
+  );
+}
+
+function ConnectWallet() {
+  const { isConnected } = useAccount();
+  if (isConnected) return <Account />;
+  return <WalletOptions />;
+}
+
+function App() {
+  return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-      {/* Here we add our button with alert callback */}
-      <div className="card">
-        <button
-          onClick={() =>
-            WebApp.showAlert(`Hello World! Current count is ${count}`)
-          }
-        >
-          Show Alert
-        </button>
+      <div className="w-full h-dvh flex flex-col justify-center items-center">
+        <ConnectWallet />
       </div>
     </>
   );
