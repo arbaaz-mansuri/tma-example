@@ -8,6 +8,8 @@ import { polygonAmoy, polygon } from "wagmi/chains";
 import { metaMask } from "wagmi/connectors";
 import WebApp from "@twa-dev/sdk";
 
+console.log(WebApp, "web app");
+
 WebApp.ready();
 
 const queryClient = new QueryClient();
